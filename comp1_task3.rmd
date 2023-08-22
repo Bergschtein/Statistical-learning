@@ -1,0 +1,69 @@
+---
+subtitle: "TMA4268 Statistical Learning V2023"
+title: "Compulsory exercise 1: Group XYZ (add your group number here)"
+author: "NN1, NN2 and NN3 (full names of all group members)"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  # html_document
+  pdf_document
+---
+  
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3,fig.align = "center")
+```
+
+```{r,eval=FALSE,echo=TRUE}
+install.packages("knitr")     # probably already installed
+install.packages("rmarkdown") # probably already installed
+install.packages("ggplot2")   # plotting with ggplot2
+install.packages("dplyr")     # for data cleaning and preparation
+install.packages("tidyr")     # also data preparation
+install.packages("carData")   # dataset
+install.packages("class")     # for KNN
+install.packages("pROC")      # calculate roc
+install.packages("plotROC")   # plot roc
+install.packages("ggmosaic")  # mosaic plot
+```
+
+<!--  Etc (load all packages needed). -->
+
+
+# Problem 3
+
+```{r}
+bigfoot_original <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-13/bigfoot.csv")
+library(dplyr)
+# Prepare the data:
+bigfoot <- bigfoot_original %>%
+  # Select the relevant covariates:
+  dplyr::select(classification, observed, longitude, latitude, visibility) %>%
+  # Remove observations of class C (these are second- or third hand accounts):
+  dplyr::filter(classification != "Class C") %>%
+  # Turn into 0/1, 1 = Class A, 0 = Class B:
+  dplyr::mutate(class = ifelse(classification == "Class A", 1, 0)) %>%
+  # Create new indicator variables for some words from the description:
+  dplyr::mutate(fur = grepl("fur", observed),
+                howl = grepl("howl", observed),
+                saw = grepl("saw", observed),
+                heard = grepl("heard", observed)) %>%
+  # Remove unnecessary variables:
+  dplyr::select(-c("classification", "observed")) %>%
+  # Remove any rows that contain missing values:
+  tidyr::drop_na()
+```
+
+```{r}
+set.seed(2023)
+# 70% of the sample size for training set
+training_set_size <- floor(0.7 * nrow(bigfoot))
+train_ind <- sample(seq_len(nrow(bigfoot)), size = training_set_size)
+train <- bigfoot[train_ind, ]
+test <- bigfoot[-train_ind, ]
+```
+
+```{r}
+summary(bigfoot)
+head(bigfoot)
+```
