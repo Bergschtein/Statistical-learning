@@ -1,4 +1,4 @@
-# Statistisk Læring Vår 2023
+# Statistical learning Spring 2023
 
-Prosjekter med prosjektbeskrivelse gjort i faget statistisk læring våren 2023 ved NTNU.
+Projects in the course Statistical learning at NTNU spring 2023
 
